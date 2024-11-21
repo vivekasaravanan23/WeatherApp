@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="weather.css">
+</head>
+<body>
+    <div id="weather-app">
+        <h1 style="color: #C8398F">Weather App</h1>
+        <input type="text" id="city-input" placeholder="Enter city name">
+        <button id="get-weather-btn">Get Weather</button>
+        <div id="weather-result">
+            <h2 id="city-name" style="color: #6E5BE2;"></h2>
+            <img id="weather-icon" src="" alt="Weather Icon" style="display: none; ">
+            <p id="temperature"></p>
+            <p id="description"></p>
+            <p id="humidity"></p>
+            <p id="error"></p>
+        </div>
+    </div>
+    <script>
+        document.getElementById('get-weather-btn').addEventListener('click', () => {
+        const city = document.getElementById('city-input').value;
+        if (city) {
+            getWeather(city);
+        }
+    });
+
+    function getWeather(city) {
+        const apiKey = '92c8524f3c63f1bea4f686b17122d8cd';
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('City not found');
+                }
+                return response.json();
+            })
+            .then(data => {
+                displayWeather(data);
+            })
+            .catch(error => {
+                document.getElementById('error').textContent = error.message;
+                document.getElementById('weather-icon').style.display = 'none';
+            });
+    }
+
+    function displayWeather(data) {
+        document.getElementById('city-name').textContent = data.name;
+        document.getElementById('temperature').textContent = `Temperature: ${data.main.temp}°C`;
+        document.getElementById('description').textContent = `Weather: ${data.weather[0].description}`;
+        document.getElementById('humidity').textContent = `Humidity: ${data.main.humidity}%`;
+        document.getElementById('error').textContent = " ";
+
+        const iconCode = data.weather[0].icon;
+        const iconUrl = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
+        const weatherIcon = document.getElementById('weather-icon');
+        weatherIcon.src = iconUrl;
+        weatherIcon.style.display = 'block';
+    }
+    </script>
+</body>
+</html>
